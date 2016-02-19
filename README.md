@@ -1,6 +1,8 @@
 # RangeSeekbar
 A seekbar widget with a configurable min/max range
 
+![screenshot](screenshot.jpg)
+
 # Install
 ```groovy
 allprojects {
