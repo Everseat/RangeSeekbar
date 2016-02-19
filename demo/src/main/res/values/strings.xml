@@ -1,0 +1,5 @@
+<resources>
+  <string name="app_name">RangeSeekbarDemo</string>
+  <string name="label_am">AM</string>
+  <string name="label_pm">PM</string>
+</resources>
