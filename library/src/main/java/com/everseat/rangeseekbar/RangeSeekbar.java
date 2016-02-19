@@ -63,6 +63,7 @@ public class RangeSeekbar extends View {
       return String.valueOf(value);
     }
   };
+  @Nullable private OnValueSetListener valueSetListener;
 
   public RangeSeekbar(Context context) {
     super(context);
@@ -143,6 +144,16 @@ public class RangeSeekbar extends View {
         return true;
       case MotionEvent.ACTION_UP:
         activeThumbDrawable.setState(new int[0]);
+
+        // Notify OnValueSetListener
+        if (valueSetListener != null) {
+          if (activeThumbDrawable == leftThumbDrawable) {
+            valueSetListener.onMinValueSet(minValue);
+          } else if (activeThumbDrawable == rightThumbDrawable) {
+            valueSetListener.onMaxValueSet(maxValue);
+          }
+        }
+
         activeThumbDrawable = null;
         invalidate();
         return true;
@@ -246,6 +257,10 @@ public class RangeSeekbar extends View {
 
   public void setLabelTextPadding(int paddingInPx) {
     labelTextPadding = paddingInPx;
+  }
+
+  public void setOnValueSetListener(@Nullable OnValueSetListener valueSetListener) {
+    this.valueSetListener = valueSetListener;
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -434,5 +449,10 @@ public class RangeSeekbar extends View {
 
   public interface ValueFormatter {
     String formatValue(float value);
+  }
+
+  public interface OnValueSetListener {
+    void onMinValueSet(float value);
+    void onMaxValueSet(float value);
   }
 }
