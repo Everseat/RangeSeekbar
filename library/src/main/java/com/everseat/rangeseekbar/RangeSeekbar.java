@@ -104,6 +104,9 @@ public class RangeSeekbar extends View {
         }
 
         if (activeThumbDrawable != null) {
+          if (getParent() != null) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+          }
           activeThumbDrawable.setState(new int[] {android.R.attr.state_pressed});
           invalidate();
           return true;
