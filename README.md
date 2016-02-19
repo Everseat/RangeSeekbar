@@ -21,9 +21,9 @@ compile 'com.github.everseat:RangeSeekbar:0.1'
 
 ```xml
 <com.everseat.rangeseekbar.RangeSeekbar
-	android:id="@+id/range_seekbar"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
+  android:id="@+id/range_seekbar"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
   app:trackColor="#000"
   app:trackFillColor="#FFF"/>
 ```
