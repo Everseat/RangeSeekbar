@@ -23,7 +23,9 @@ public class MainActivity extends AppCompatActivity {
       public String formatValue(float value) {
         int hour = (int) (value * 23);
         String amOrPm = hour >= 12 ? "PM" : "AM";
-        hour = Math.abs(hour - 12);
+        if (hour > 12) {
+          hour -= 12;
+        }
         if (hour == 0) {
           hour = 12;
         }
