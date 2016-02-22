@@ -208,8 +208,21 @@ public class RangeSeekbar extends View {
     drawLabel(canvas, minLabelText, minValueLabelBounds);
     drawLabel(canvas, maxLabelText, maxValueLabelBounds);
 
-    // Draw min/max values
-    drawValueText(canvas);
+    // Draw min value text
+    Rect leftThumbBounds = leftThumbDrawable.getBounds();
+    String minValueText = valueFormatter.formatValue(minValue);
+    valuePaint.getTextBounds(minValueText, 0, minValueText.length(), sharedTextBounds);
+    setRectXPosition(sharedTextBounds, leftThumbBounds.centerX() - (sharedTextBounds.width() / 2));
+    setRectYPosition(sharedTextBounds, leftThumbBounds.bottom + valueTextPadding);
+    drawValue(canvas, minValueText, sharedTextBounds);
+
+    // Draw max value text
+    Rect rightThumbBounds = rightThumbDrawable.getBounds();
+    String maxValueText = valueFormatter.formatValue(maxValue);
+    valuePaint.getTextBounds(maxValueText, 0, maxValueText.length(), sharedTextBounds);
+    setRectXPosition(sharedTextBounds, rightThumbBounds.centerX() - (sharedTextBounds.width() / 2));
+    setRectYPosition(sharedTextBounds, rightThumbBounds.bottom + valueTextPadding);
+    drawValue(canvas, maxValueText, sharedTextBounds);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -351,29 +364,8 @@ public class RangeSeekbar extends View {
     return x / trackBounds.width();
   }
 
-  private void drawValueText(Canvas canvas) {
-    Rect leftThumbBounds = leftThumbDrawable.getBounds();
-    Rect rightThumbBounds = rightThumbDrawable.getBounds();
-
-    // Draw min value text
-    String minValueText = valueFormatter.formatValue(minValue);
-    valuePaint.getTextBounds(minValueText, 0, minValueText.length(), sharedTextBounds);
-    canvas.drawText(
-        minValueText,
-        ((leftThumbBounds.left + leftThumbBounds.right) / 2) - (sharedTextBounds.width() / 2),
-        leftThumbBounds.bottom + sharedTextBounds.height() + valueTextPadding,
-        valuePaint
-    );
-
-    // Draw max value text
-    String maxValueText = valueFormatter.formatValue(maxValue);
-    valuePaint.getTextBounds(maxValueText, 0, maxValueText.length(), sharedTextBounds);
-    canvas.drawText(
-        maxValueText,
-        ((rightThumbBounds.left + rightThumbBounds.right) / 2) - (sharedTextBounds.width() / 2),
-        rightThumbBounds.bottom + sharedTextBounds.height() + valueTextPadding,
-        valuePaint
-    );
+  private void drawValue(Canvas canvas, String text, Rect bounds) {
+    canvas.drawText(text, bounds.left, bounds.bottom, valuePaint);
   }
 
   private void drawLabel(Canvas canvas, String text, Rect bounds) {
