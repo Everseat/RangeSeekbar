@@ -45,7 +45,7 @@ public class RangeSeekbar extends View {
 
   // Paint
   private Paint valuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-  private Paint valueLabelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+  private Paint labelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
   private Paint sharedPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
   // State values
@@ -91,7 +91,7 @@ public class RangeSeekbar extends View {
 
     // Configure paint
     valuePaint.setTextSize(valueTextSize);
-    valueLabelPaint.setTextSize(labelTextSize);
+    labelPaint.setTextSize(labelTextSize);
 
     thumbSize = Math.max(leftThumbDrawable.getIntrinsicHeight(), leftThumbDrawable.getIntrinsicWidth());
   }
@@ -172,8 +172,8 @@ public class RangeSeekbar extends View {
   protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
     super.onLayout(changed, left, top, right, bottom);
     // Min/max value label
-    valueLabelPaint.getTextBounds(minLabelText, 0, minLabelText.length(), minValueLabelBounds);
-    valueLabelPaint.getTextBounds(maxLabelText, 0, maxLabelText.length(), maxValueLabelBounds);
+    labelPaint.getTextBounds(minLabelText, 0, minLabelText.length(), minValueLabelBounds);
+    labelPaint.getTextBounds(maxLabelText, 0, maxLabelText.length(), maxValueLabelBounds);
     setRectXPosition(minValueLabelBounds, labelTextPadding);
     setRectYPosition(minValueLabelBounds, (getMeasuredHeight() / 2) - (minValueLabelBounds.height() / 2));
     setRectXPosition(maxValueLabelBounds, (getMeasuredWidth() - maxValueLabelBounds.width()) - labelTextPadding);
@@ -205,7 +205,8 @@ public class RangeSeekbar extends View {
     rightThumbDrawable.draw(canvas);
 
     // Draw min/max value label
-    drawValueLabels(canvas);
+    drawLabel(canvas, minLabelText, minValueLabelBounds);
+    drawLabel(canvas, maxLabelText, maxValueLabelBounds);
 
     // Draw min/max values
     drawValueText(canvas);
@@ -375,20 +376,8 @@ public class RangeSeekbar extends View {
     );
   }
 
-  private void drawValueLabels(Canvas canvas) {
-    canvas.drawText(
-        minLabelText,
-        minValueLabelBounds.left,
-        minValueLabelBounds.bottom,
-        valueLabelPaint
-    );
-
-    canvas.drawText(
-        maxLabelText,
-        maxValueLabelBounds.left,
-        maxValueLabelBounds.bottom,
-        valueLabelPaint
-    );
+  private void drawLabel(Canvas canvas, String text, Rect bounds) {
+    canvas.drawText(text, bounds.left, bounds.bottom, labelPaint);
   }
 
   private RectF getBoundsBetween(Rect left, Rect right) {
