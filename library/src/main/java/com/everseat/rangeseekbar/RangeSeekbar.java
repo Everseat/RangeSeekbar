@@ -55,8 +55,11 @@ public class RangeSeekbar extends View {
   private float initialTouchedY = 0;
   private float minValue = 0f;
   private float maxValue = 1f;
+  private float currentValue = 0f;
   private String minLabelText;
   private String maxLabelText;
+  private int mode = MODE_DOUBLE;
+
   private ValueFormatter valueFormatter = new ValueFormatter() {
     @Override
     public String formatValue(float value) {
@@ -64,6 +67,9 @@ public class RangeSeekbar extends View {
     }
   };
   @Nullable private OnValueSetListener valueSetListener;
+
+  public static final int MODE_DOUBLE = 0;
+  public static final int MODE_SINGLE = 1;
 
   public RangeSeekbar(Context context) {
     super(context);
@@ -261,6 +267,10 @@ public class RangeSeekbar extends View {
 
   public void setOnValueSetListener(@Nullable OnValueSetListener valueSetListener) {
     this.valueSetListener = valueSetListener;
+  }
+
+  public void setMode(int mode) {
+    this.mode = mode;
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
