@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <declare-styleable name="RangeSeekbar">
+    <attr name="valueTextSize" format="dimension|reference"/>
+    <attr name="valueTextPadding" format="dimension|reference"/>
+    <attr name="thumbDrawable" format="reference"/>
+  </declare-styleable>
+
+  <declare-styleable name="AbsSeekbar">
     <attr name="trackHeight" format="dimension|reference"/>
     <attr name="trackColor" format="color|reference"/>
     <attr name="trackFillColor" format="color|reference"/>
-    <attr name="valueTextSize" format="dimension|reference"/>
     <attr name="labelTextSize" format="dimension|reference"/>
-    <attr name="valueTextPadding" format="dimension|reference"/>
     <attr name="labelTextPadding" format="dimension|reference"/>
     <attr name="minLabelText" format="string|reference"/>
     <attr name="maxLabelText" format="string|reference"/>
-    <attr name="thumbDrawable" format="reference"/>
   </declare-styleable>
 </resources>

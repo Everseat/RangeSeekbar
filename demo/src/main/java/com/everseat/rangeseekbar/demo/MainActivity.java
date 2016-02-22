@@ -14,7 +14,6 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     rangeSeekbar = (RangeSeekbar) findViewById(R.id.range_seekbar);
-    rangeSeekbar.setMode(RangeSeekbar.MODE_SINGLE);
     rangeSeekbar.setTrackFillColor(Color.CYAN);
     rangeSeekbar.setTrackColor(Color.argb(102, 0, 0, 0));
     rangeSeekbar.setMinLabelText(R.string.label_am);
