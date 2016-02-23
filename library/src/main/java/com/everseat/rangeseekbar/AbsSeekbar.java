@@ -75,19 +75,19 @@ public abstract class AbsSeekbar extends View {
   @Override
   protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
     super.onLayout(changed, left, top, right, bottom);
-    // Min/max value label
-    labelPaint.getTextBounds(minLabelText, 0, minLabelText.length(), minLabelBounds);
-    labelPaint.getTextBounds(maxLabelText, 0, maxLabelText.length(), maxLabelBounds);
-    setRectXPosition(minLabelBounds, labelTextPadding);
-    setRectYPosition(minLabelBounds, (getMeasuredHeight() / 2) - (minLabelBounds.height() / 2));
-    setRectXPosition(maxLabelBounds, (getMeasuredWidth() - maxLabelBounds.width()) - labelTextPadding);
-    setRectYPosition(maxLabelBounds, (getMeasuredHeight() / 2) - (maxLabelBounds.height() / 2));
-
     // Track
     trackBounds.left = minLabelBounds.right + labelTextPadding + getTrackLeftOffset();
     trackBounds.top = (getMeasuredHeight() / 2) - trackHeight;
     trackBounds.right = maxLabelBounds.left - labelTextPadding - getTrackRightOffset();
     trackBounds.bottom = trackBounds.top + trackHeight;
+
+    // Min/max value label
+    labelPaint.getTextBounds(minLabelText, 0, minLabelText.length(), minLabelBounds);
+    labelPaint.getTextBounds(maxLabelText, 0, maxLabelText.length(), maxLabelBounds);
+    setRectXPosition(minLabelBounds, labelTextPadding);
+    setRectYPosition(minLabelBounds, (int) trackBounds.centerY() - (minLabelBounds.height() / 2));
+    setRectXPosition(maxLabelBounds, (getMeasuredWidth() - maxLabelBounds.width()) - labelTextPadding);
+    setRectYPosition(maxLabelBounds, (int) (trackBounds.centerY() - (minLabelBounds.height() / 2)));
   }
 
   @Override
