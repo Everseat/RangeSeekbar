@@ -104,7 +104,7 @@ public abstract class AbsSeekbar extends View {
   @Override
   public void setEnabled(boolean enabled) {
     super.setEnabled(enabled);
-    setAlpha(0.5f);
+    setAlpha(enabled ? 1f : 0.5f);
   }
 
   @Override
