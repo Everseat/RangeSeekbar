@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <attr name="valueTextSize" format="dimension|reference"/>
+  <attr name="valueTextPadding" format="dimension|reference"/>
+  <attr name="thumbDrawable" format="reference"/>
+
   <declare-styleable name="RangeSeekbar">
-    <attr name="valueTextSize" format="dimension|reference"/>
-    <attr name="valueTextPadding" format="dimension|reference"/>
-    <attr name="thumbDrawable" format="reference"/>
+    <attr name="valueTextSize"/>
+    <attr name="valueTextPadding"/>
+    <attr name="thumbDrawable"/>
+  </declare-styleable>
+
+  <declare-styleable name="Seekbar">
+    <attr name="valueTextSize"/>
+    <attr name="valueTextPadding"/>
+    <attr name="thumbDrawable"/>
   </declare-styleable>
 
   <declare-styleable name="AbsSeekbar">
