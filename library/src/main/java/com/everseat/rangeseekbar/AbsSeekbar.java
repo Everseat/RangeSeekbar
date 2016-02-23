@@ -15,6 +15,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -98,6 +99,18 @@ public abstract class AbsSeekbar extends View {
     // Draw min/max value label
     drawLabel(canvas, minLabelText, minLabelBounds);
     drawLabel(canvas, maxLabelText, maxLabelBounds);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    setAlpha(0.5f);
+  }
+
+  @Override
+  public boolean dispatchTouchEvent(MotionEvent event) {
+    if (!isEnabled()) return false;
+    return super.dispatchTouchEvent(event);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
