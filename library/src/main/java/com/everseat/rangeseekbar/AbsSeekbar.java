@@ -84,9 +84,9 @@ public abstract class AbsSeekbar extends View {
     setRectYPosition(maxLabelBounds, (getMeasuredHeight() / 2) - (maxLabelBounds.height() / 2));
 
     // Track
-    trackBounds.left = minLabelBounds.right + getTrackLeftOffset();
+    trackBounds.left = minLabelBounds.right + labelTextPadding + getTrackLeftOffset();
     trackBounds.top = (getMeasuredHeight() / 2) - trackHeight;
-    trackBounds.right = maxLabelBounds.left - getTrackRightOffset();
+    trackBounds.right = maxLabelBounds.left - labelTextPadding - getTrackRightOffset();
     trackBounds.bottom = trackBounds.top + trackHeight;
   }
 
