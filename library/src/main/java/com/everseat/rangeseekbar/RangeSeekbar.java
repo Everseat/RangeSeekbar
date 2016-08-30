@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
@@ -209,6 +210,16 @@ public class RangeSeekbar extends AbsSeekbar {
   //////////////////////////////////////////////////////////////////////////////////////////////////
   // Public API
   //////////////////////////////////////////////////////////////////////////////////////////////////
+
+  public void setCurrentRange(float min, float max) {
+    minValue = min;
+    maxValue = max;
+
+    if (!ViewCompat.isInLayout(this)) {
+      requestLayout();
+      invalidate();
+    }
+  }
 
   public void setOnValueSetListener(@Nullable RangeSeekbar.OnValueSetListener valueSetListener) {
     this.valueSetListener = valueSetListener;
