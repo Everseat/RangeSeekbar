@@ -7,32 +7,39 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+
+import static com.everseat.rangeseekbar.Util.dpToPx;
 
 /**
  * An abstract seek bar
  */
 public abstract class AbsSeekbar extends View {
+  private Drawable thumbDrawable;
+
   // Dimensions
   private int trackHeight = 0;
   private int labelTextPadding = 0;
   private int labelTextSize = 0;
+  private int valueTextPadding = 0;
 
   // Size holders
+  Rect sharedTextBounds = new Rect();
   private RectF trackBounds = new RectF();
   private Rect minLabelBounds = new Rect();
   private Rect maxLabelBounds = new Rect();
 
   // Paint
+  private Paint valuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
   private Paint labelPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
   private Paint sharedPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -42,6 +49,8 @@ public abstract class AbsSeekbar extends View {
   private float progress = 0f;
   private String minLabelText;
   private String maxLabelText;
+  static final int[] STATE_PRESSED = new int[] {android.R.attr.state_pressed};
+  static final int[] STATE_DEFAULT = new int[] {};
 
   private ValueFormatter valueFormatter = new ValueFormatter() {
     @Override
@@ -67,9 +76,6 @@ public abstract class AbsSeekbar extends View {
 
   private void init(Context context, AttributeSet attrs) {
     applyAttributes(context, attrs);
-
-    // Configure paint
-    labelPaint.setTextSize(labelTextSize);
   }
 
   @Override
@@ -145,6 +151,10 @@ public abstract class AbsSeekbar extends View {
     maxLabelText = text;
   }
 
+  private void setLabelTextSize(float textSize) {
+    labelPaint.setTextSize(textSize);
+  }
+
   public void setValueFormatter(@NonNull ValueFormatter formatter) {
     this.valueFormatter = formatter;
   }
@@ -171,7 +181,31 @@ public abstract class AbsSeekbar extends View {
   }
 
   public RectF getTrackBounds() {
-    return new RectF(trackBounds);
+    return trackBounds;
+  }
+
+  public void setValueTextPadding(int paddingInPx) {
+    valueTextPadding = paddingInPx;
+  }
+
+  public void setValueTextSize(float textSize) {
+    valuePaint.setTextSize(textSize);
+  }
+
+  public int getValueTextPadding() {
+    return valueTextPadding;
+  }
+
+  public void setThumbDrawable(@DrawableRes int drawable) {
+    setThumbDrawable(getResources().getDrawable(drawable));
+  }
+
+  public void setThumbDrawable(Drawable drawable) {
+    thumbDrawable = drawable;
+  }
+
+  public Drawable getThumbDrawable() {
+    return thumbDrawable;
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -179,9 +213,19 @@ public abstract class AbsSeekbar extends View {
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
   private void applyAttributes(@NonNull Context context, @Nullable AttributeSet attrs) {
+    String minLabelText = null;
+    String maxLabelText = null;
+    float labelTextSize = 0;
+    int labelTextPadding = 0;
+    int trackHeight = 0;
+    int trackColor = 0;
+    int trackFillColor = 0;
+    float valueTextSize = 0;
+    int valueTextPadding = 0;
+    Drawable thumbDrawable = null;
+
     if (attrs != null) {
       TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.AbsSeekbar);
-
       int count = ta.getIndexCount();
       for (int i = 0; i < count; i++) {
         int attr = ta.getIndex(i);
@@ -190,18 +234,23 @@ public abstract class AbsSeekbar extends View {
         } else if (attr == R.styleable.AbsSeekbar_maxLabelText) {
           maxLabelText = ta.getString(attr);
         } else if (attr == R.styleable.AbsSeekbar_labelTextSize) {
-          labelTextSize = ta.getDimensionPixelSize(attr, (int) dpToPx(12));
+          labelTextSize = ta.getDimension(attr, dpToPx(getResources(), 12));
         } else if (attr == R.styleable.AbsSeekbar_labelTextPadding) {
-          labelTextPadding = ta.getDimensionPixelSize(attr, (int) dpToPx(4));
+          labelTextPadding = ta.getDimensionPixelSize(attr, (int) dpToPx(getResources(), 4));
         } else if (attr == R.styleable.AbsSeekbar_trackHeight) {
-          trackHeight = ta.getDimensionPixelSize(attr, (int) dpToPx(3));
+          trackHeight = ta.getDimensionPixelSize(attr, (int) dpToPx(getResources(), 3));
         } else if (attr == R.styleable.AbsSeekbar_trackColor) {
           trackColor = ta.getColor(attr, Color.BLACK);
         } else if (attr == R.styleable.AbsSeekbar_trackFillColor) {
           trackFillColor = ta.getColor(attr, Color.BLACK);
+        } else if (attr == R.styleable.AbsSeekbar_valueTextSize) {
+          valueTextSize = ta.getDimension(attr, dpToPx(getResources(), 14));
+        } else if (attr == R.styleable.AbsSeekbar_valueTextPadding) {
+          valueTextPadding = ta.getDimensionPixelSize(attr, (int) dpToPx(getResources(), 4));
+        } else if (attr == R.styleable.AbsSeekbar_thumbDrawable) {
+          thumbDrawable = ta.getDrawable(attr);
         }
       }
-
       ta.recycle();
     }
 
@@ -212,13 +261,13 @@ public abstract class AbsSeekbar extends View {
       maxLabelText = "Max";
     }
     if (labelTextSize == 0) {
-      labelTextSize = (int) dpToPx(12);
+      labelTextSize = dpToPx(getResources(), 12);
     }
     if (labelTextPadding == 0) {
-      labelTextPadding = (int) dpToPx(4);
+      labelTextPadding = (int) dpToPx(getResources(), 4);
     }
     if (trackHeight == 0) {
-      trackHeight = (int) dpToPx(3);
+      trackHeight = (int) dpToPx(getResources(), 3);
     }
     if (trackColor == 0) {
       trackColor = Color.BLACK;
@@ -226,6 +275,26 @@ public abstract class AbsSeekbar extends View {
     if (trackFillColor == 0) {
       trackFillColor = Color.BLACK;
     }
+    if (valueTextSize == 0) {
+      valueTextSize = dpToPx(getResources(), 14);
+    }
+    if (valueTextPadding == 0) {
+      valueTextPadding = (int) dpToPx(getResources(), 4);
+    }
+    if (thumbDrawable == null) {
+      thumbDrawable = getResources().getDrawable(R.drawable.ic_thumb_seekbar);
+    }
+
+    setMinLabelText(minLabelText);
+    setMaxLabelText(maxLabelText);
+    setLabelTextSize(labelTextSize);
+    setLabelTextPadding(labelTextPadding);
+    setTrackHeight(trackHeight);
+    setTrackColor(trackColor);
+    setTrackFillColor(trackFillColor);
+    setValueTextSize(valueTextSize);
+    setValueTextPadding(valueTextPadding);
+    setThumbDrawable(thumbDrawable);
   }
 
   private void drawLabel(Canvas canvas, String text, Rect bounds) {
@@ -241,11 +310,6 @@ public abstract class AbsSeekbar extends View {
 
   protected String formatValue(float value) {
     return valueFormatter.formatValue(value);
-  }
-
-  protected float dpToPx(float dp) {
-    DisplayMetrics dm = getResources().getDisplayMetrics();
-    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, dm);
   }
 
   /**
@@ -272,12 +336,31 @@ public abstract class AbsSeekbar extends View {
     canvas.drawRoundRect(fill, trackHeight / 2, trackHeight / 2, sharedPaint);
   }
 
-  protected int getTrackLeftOffset() {
-    return 0;
+  void measureText(String text, Rect outRect) {
+    valuePaint.getTextBounds(text, 0, text.length(), outRect);
   }
 
-  protected int getTrackRightOffset() {
-    return 0;
+  float calculateValue(int x) {
+    if (x < 0) return 0;
+    if (x > trackBounds.width()) return 1;
+    return x / trackBounds.width();
+  }
+
+  void drawValueText(Canvas canvas, String text, Rect bounds) {
+    canvas.drawText(text, bounds.left, bounds.bottom, valuePaint);
+  }
+
+  private int getTrackLeftOffset() {
+    return getThumbSize();
+  }
+
+  private int getTrackRightOffset() {
+    return getThumbSize();
+  }
+
+  private int getThumbSize() {
+    if (thumbDrawable == null) return 0;
+    return Math.max(thumbDrawable.getIntrinsicWidth(), thumbDrawable.getIntrinsicHeight());
   }
 
   public interface ValueFormatter {
