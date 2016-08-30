@@ -11,14 +11,21 @@ import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import static com.everseat.rangeseekbar.Util.dpToPx;
+import static com.everseat.rangeseekbar.Util.expandRect;
+import static com.everseat.rangeseekbar.Util.withinBounds;
+
 /**
  * A seek bar with a configurable min/max range values.
  */
-public class RangeSeekbar extends Seekbar {
+public class RangeSeekbar extends AbsSeekbar {
+  private Drawable leftThumbDrawable;
+  private Drawable rightThumbDrawable;
+
   // Size holders
-  private RectF trackBounds;
+  private Rect sharedTextBounds = new Rect();
   private Rect leftThumbBounds = new Rect();
-  private Rect rightThumbBounds; // This will be aliased to the existing thumbBounds from Seekbar
+  private Rect rightThumbBounds = new Rect();
 
   // State values
   private int activeThumb = -1;
@@ -46,145 +53,162 @@ public class RangeSeekbar extends Seekbar {
   }
 
   private void init(Context context, AttributeSet attrs) {
-    setCurrentValue(maxValue);
+    leftThumbDrawable = getThumbDrawable();
+    rightThumbDrawable = leftThumbDrawable.getConstantState().newDrawable();
   }
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     int action = MotionEventCompat.getActionMasked(event);
     switch (action) {
-      case MotionEvent.ACTION_DOWN:
-        float x = event.getX();
-        float y = event.getY();
-        if (withinBounds(x, y, leftThumbBounds)) {
-          activeThumb = THUMB_LEFT;
-          if (getParent() != null) {
-            getParent().requestDisallowInterceptTouchEvent(true);
-          }
-          invalidate();
-          return true;
-        }
-
-        boolean result = super.onTouchEvent(event);
-        if (result) activeThumb = THUMB_RIGHT;
-        return result;
-      case MotionEvent.ACTION_MOVE:
-        // We only support a horizontal bar at the moment
-        int radius = leftThumbBounds.width() / 2;
-        float newX = (int) event.getX() - radius;
-
-        if (activeThumb == THUMB_LEFT) {
-          Rect destination = rightThumbBounds;
-
-          setRectXPosition(leftThumbBounds, (int) newX);
-
-          // Ensure left thumb does not cross paths with right thumb
-          if (leftThumbBounds.right >= destination.left) {
-            setRectXPosition(leftThumbBounds, destination.left - leftThumbBounds.width());
-            minValue = calculateValue((int) (leftThumbBounds.centerX() - trackBounds.left));
-          } else {
-            // Ensure left thumb doesn't get moved outside of bounds
-            if (leftThumbBounds.centerX() <= trackBounds.left) {
-              setRectXPosition(leftThumbBounds, (int) (trackBounds.left - (leftThumbBounds.width()/2)));
-            }
-
-            // We want the center of the thumb drawable to be the deciding factor
-            minValue = Math.max(calculateValue((int) (leftThumbBounds.centerX() - trackBounds.left)), 0);
-          }
-        }
-
-        if (activeThumb == THUMB_RIGHT) {
-          Rect destination = leftThumbBounds;
-
-          setRectXPosition(rightThumbBounds, (int) newX);
-
-          // Ensure right thumb does not cross paths with left thumb
-          if (rightThumbBounds.left <= destination.right) {
-            setRectXPosition(rightThumbBounds, destination.right);
-            maxValue = calculateValue((int) (rightThumbBounds.centerX() - trackBounds.left));
-            setCurrentValue(maxValue);
-          } else {
-            // Ensure right thumb doesn't get moved outside of bounds
-            if (rightThumbBounds.centerX() >= trackBounds.right) {
-              setRectXPosition(rightThumbBounds, (int) (trackBounds.right - (rightThumbBounds.width()/2)));
-            }
-
-            maxValue = Math.min(calculateValue((int) (rightThumbBounds.centerX() - trackBounds.left)), 1);
-            setCurrentValue(maxValue);
-          }
-        }
-
-        invalidate();
-        return true;
-      case MotionEvent.ACTION_UP:
-        // Notify OnValueSetListener
-        if (valueSetListener != null) {
-          if (activeThumb == THUMB_LEFT) {
-            valueSetListener.onMinValueSet(minValue);
-          } else if (activeThumb == THUMB_RIGHT) {
-            valueSetListener.onMaxValueSet(maxValue);
-          }
-        }
-
-        activeThumb = -1;
-        invalidate();
-        return true;
-      default:
-        return super.onTouchEvent(event);
+      case MotionEvent.ACTION_DOWN: return handleDownEvent(event);
+      case MotionEvent.ACTION_MOVE: return handleMoveEvent(event);
+      case MotionEvent.ACTION_UP: return handleUpEvent();
+      default: return super.onTouchEvent(event);
     }
+  }
+
+  private boolean handleUpEvent() {
+    // Notify OnValueSetListener
+    if (valueSetListener != null) {
+      if (activeThumb == THUMB_LEFT) {
+        valueSetListener.onMinValueSet(minValue);
+      } else if (activeThumb == THUMB_RIGHT) {
+        valueSetListener.onMaxValueSet(maxValue);
+      }
+    }
+
+    activeThumb = -1;
+    invalidate();
+    return true;
+  }
+
+  private boolean handleMoveEvent(MotionEvent event) {
+    // We only support a horizontal bar at the moment
+    int radius = leftThumbBounds.width() / 2;
+    float newX = (int) event.getX() - radius;
+
+    if (activeThumb == THUMB_LEFT) {
+      Rect destination = rightThumbBounds;
+
+      setRectXPosition(leftThumbBounds, (int) newX);
+
+      // Ensure left thumb does not cross paths with right thumb
+      if (leftThumbBounds.right >= destination.left) {
+        setRectXPosition(leftThumbBounds, destination.left - leftThumbBounds.width());
+        minValue = calculateValue((int) (leftThumbBounds.centerX() - getTrackBounds().left));
+      } else {
+        // Ensure left thumb doesn't get moved outside of bounds
+        if (leftThumbBounds.centerX() <= getTrackBounds().left) {
+          setRectXPosition(leftThumbBounds, (int) (getTrackBounds().left - (leftThumbBounds.width()/2)));
+        }
+
+        // We want the center of the thumb drawable to be the deciding factor
+        minValue = Math.max(calculateValue((int) (leftThumbBounds.centerX() - getTrackBounds().left)), 0);
+      }
+    }
+
+    if (activeThumb == THUMB_RIGHT) {
+      Rect destination = leftThumbBounds;
+
+      setRectXPosition(rightThumbBounds, (int) newX);
+
+      // Ensure right thumb does not cross paths with left thumb
+      if (rightThumbBounds.left <= destination.right) {
+        setRectXPosition(rightThumbBounds, destination.right);
+        maxValue = calculateValue((int) (rightThumbBounds.centerX() - getTrackBounds().left));
+      } else {
+        // Ensure right thumb doesn't get moved outside of bounds
+        if (rightThumbBounds.centerX() >= getTrackBounds().right) {
+          setRectXPosition(rightThumbBounds, (int) (getTrackBounds().right - (rightThumbBounds.width()/2)));
+        }
+
+        maxValue = Math.min(calculateValue((int) (rightThumbBounds.centerX() - getTrackBounds().left)), 1);
+      }
+    }
+
+    invalidate();
+    return true;
+  }
+
+  private boolean handleDownEvent(MotionEvent event) {
+    float x = event.getX();
+    float y = event.getY();
+
+    if (withinBounds(x, y, expandRect(leftThumbBounds, (int) dpToPx(getResources(), 4)))) {
+      activeThumb = THUMB_LEFT;
+      if (getParent() != null) {
+        getParent().requestDisallowInterceptTouchEvent(true);
+      }
+      invalidate();
+      return true;
+    }
+
+    if (withinBounds(x, y, expandRect(rightThumbBounds, (int) dpToPx(getResources(), 4)))) {
+      activeThumb = THUMB_RIGHT;
+      if (getParent() != null) {
+        getParent().requestDisallowInterceptTouchEvent(true);
+      }
+      invalidate();
+      return true;
+    }
+
+    return false;
   }
 
   @Override
   protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
     super.onLayout(changed, left, top, right, bottom);
-    trackBounds = getTrackBounds();
-    Drawable thumbDrawable = getThumbDrawable();
-    int thumbSize = thumbDrawable.getBounds().width();
+    RectF trackBounds = getTrackBounds();
 
     // Right thumb
-    rightThumbBounds = getThumbBounds();
+    int rightThumbSize = Math.max(rightThumbDrawable.getIntrinsicWidth(), rightThumbDrawable.getIntrinsicHeight());
+    int rightX = (int) (trackBounds.right - (rightThumbSize / 2));
+    int rightY = (int) (trackBounds.centerY() - (rightThumbSize / 2));
+    rightThumbBounds.set(rightX, rightY, rightX + rightThumbSize, rightY + rightThumbSize);
 
     // Left thumb
-    int x = (int) (trackBounds.left - (thumbSize / 2));
-    int y = (int) (trackBounds.centerY() - (thumbSize / 2));
-    leftThumbBounds.set(x, y, x + thumbSize, y + thumbSize);
+    int leftThumbSize = Math.max(leftThumbDrawable.getIntrinsicWidth(), leftThumbDrawable.getIntrinsicHeight());
+    int x = (int) (trackBounds.left - (leftThumbSize / 2));
+    int y = (int) (trackBounds.centerY() - (leftThumbSize / 2));
+    leftThumbBounds.set(x, y, x + leftThumbSize, y + leftThumbSize);
   }
 
   @Override
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
+    onDrawThumb(canvas);
 
     // Draw left value text
     String minValueText = formatValue(minValue);
-    Rect minValueTextBounds = measureValueText(minValueText);
-    setRectXPosition(minValueTextBounds, leftThumbBounds.centerX() - (minValueTextBounds.width() / 2));
-    setRectYPosition(minValueTextBounds, leftThumbBounds.bottom + getValueTextPadding());
-    onDrawValueText(canvas, minValueTextBounds, minValueText);
+    measureText(minValueText, sharedTextBounds);
+    setRectXPosition(sharedTextBounds, leftThumbBounds.centerX() - (sharedTextBounds.width() / 2));
+    setRectYPosition(sharedTextBounds, leftThumbBounds.bottom + getValueTextPadding());
+    drawValueText(canvas, minValueText, sharedTextBounds);
+
+    // Draw right value text
+    String maxValueText = formatValue(maxValue);
+    measureText(maxValueText, sharedTextBounds);
+    setRectXPosition(sharedTextBounds, rightThumbBounds.centerX() - (sharedTextBounds.width() / 2));
+    setRectYPosition(sharedTextBounds, rightThumbBounds.bottom + getValueTextPadding());
+    drawValueText(canvas, maxValueText, sharedTextBounds);
   }
 
-  @Override
-  protected void onDrawThumb(Canvas canvas) {
-    Drawable thumbDrawable = getThumbDrawable();
-
+  private void onDrawThumb(Canvas canvas) {
     // Right
-    thumbDrawable.setBounds(rightThumbBounds);
-    thumbDrawable.setState(activeThumb == THUMB_RIGHT ? STATE_PRESSED : STATE_DEFAULT);
-    thumbDrawable.draw(canvas);
+    rightThumbDrawable.setBounds(rightThumbBounds);
+    rightThumbDrawable.setState(activeThumb == THUMB_RIGHT ? STATE_PRESSED : STATE_DEFAULT);
+    rightThumbDrawable.draw(canvas);
 
     // Left
-    thumbDrawable.setBounds(leftThumbBounds);
-    thumbDrawable.setState(activeThumb == THUMB_LEFT ? STATE_PRESSED : STATE_DEFAULT);
-    thumbDrawable.draw(canvas);
+    leftThumbDrawable.setBounds(leftThumbBounds);
+    leftThumbDrawable.setState(activeThumb == THUMB_LEFT ? STATE_PRESSED : STATE_DEFAULT);
+    leftThumbDrawable.draw(canvas);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
   // Public API
   //////////////////////////////////////////////////////////////////////////////////////////////////
-
-  @Override
-  public void setCurrentValue(float value) {
-    // No op
-  }
 
   public void setOnValueSetListener(@Nullable RangeSeekbar.OnValueSetListener valueSetListener) {
     this.valueSetListener = valueSetListener;
@@ -200,9 +224,9 @@ public class RangeSeekbar extends Seekbar {
     sharedPaint.setAntiAlias(true);
     sharedPaint.setColor(getTrackFillColor());
     RectF fill = new RectF(leftThumbBounds.centerX(),
-        trackBounds.top,
-        getThumbBounds().centerX(),
-        trackBounds.bottom);
+        getTrackBounds().top,
+        rightThumbBounds.centerX(),
+        getTrackBounds().bottom);
     canvas.drawRoundRect(fill, getTrackHeight() / 2, getTrackHeight() / 2, sharedPaint);
   }
 
