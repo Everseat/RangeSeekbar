@@ -4,18 +4,18 @@ apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.everseat'
 
 android {
-  compileSdkVersion 23
-  buildToolsVersion "23.0.2"
+  compileSdkVersion 24
+  buildToolsVersion "23.0.3"
 
   defaultConfig {
     minSdkVersion 11
-    targetSdkVersion 23
+    targetSdkVersion 24
     versionCode 1
     versionName "0.1"
   }
 }
 
 dependencies {
-  compile 'com.android.support:support-annotations:23.1.1'
-  compile 'com.android.support:support-v4:23.1.1'
+  compile 'com.android.support:support-annotations:24.2.0'
+  compile 'com.android.support:support-v4:24.2.0'
 }
