@@ -181,6 +181,11 @@ public class RangeSeekbar extends Seekbar {
   // Public API
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
+  @Override
+  public void setCurrentValue(float value) {
+    // No op
+  }
+
   public void setOnValueSetListener(@Nullable RangeSeekbar.OnValueSetListener valueSetListener) {
     this.valueSetListener = valueSetListener;
   }

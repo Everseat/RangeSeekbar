@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v4.view.ViewCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -197,6 +198,10 @@ public class Seekbar extends AbsSeekbar {
 
   public void setCurrentValue(float value) {
     currentValue = value;
+    if (!ViewCompat.isInLayout(this)) {
+      requestLayout();
+      invalidate();
+    }
   }
 
   public Drawable getThumbDrawable() {
