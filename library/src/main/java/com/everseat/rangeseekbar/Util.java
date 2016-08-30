@@ -1,7 +1,6 @@
 package com.everseat.rangeseekbar;
 
 import android.content.res.Resources;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
