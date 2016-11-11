@@ -164,15 +164,20 @@ public class RangeSeekbar extends AbsSeekbar {
 
     // Right thumb
     int rightThumbSize = Math.max(rightThumbDrawable.getIntrinsicWidth(), rightThumbDrawable.getIntrinsicHeight());
-    int rightX = (int) (trackBounds.right - (rightThumbSize / 2));
-    int rightY = (int) (trackBounds.centerY() - (rightThumbSize / 2));
-    rightThumbBounds.set(rightX, rightY, rightX + rightThumbSize, rightY + rightThumbSize);
+    rightThumbBounds.set(rightThumbBounds.left, rightThumbBounds.top, rightThumbBounds.left + rightThumbSize, leftThumbBounds.top + rightThumbSize);
+    int centerX = (int) (trackBounds.left + trackBounds.width() * maxValue);
+    int centerY = (int) trackBounds.centerY();
+    setRectCenterX(rightThumbBounds, centerX);
+    setRectCenterY(rightThumbBounds, centerY);
 
     // Left thumb
     int leftThumbSize = Math.max(leftThumbDrawable.getIntrinsicWidth(), leftThumbDrawable.getIntrinsicHeight());
-    int x = (int) (trackBounds.left - (leftThumbSize / 2));
-    int y = (int) (trackBounds.centerY() - (leftThumbSize / 2));
-    leftThumbBounds.set(x, y, x + leftThumbSize, y + leftThumbSize);
+    leftThumbBounds.set(leftThumbBounds.left, leftThumbBounds.top, leftThumbBounds.left + leftThumbSize, leftThumbBounds.top + leftThumbSize);
+    centerX = (int) (trackBounds.left + trackBounds.width() * minValue);
+    centerY = (int) trackBounds.centerY();
+    setRectCenterX(leftThumbBounds, centerX);
+    setRectCenterY(leftThumbBounds, centerY);
+
   }
 
   @Override
