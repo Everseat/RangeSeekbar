@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
         seekbar.setCurrentValue(0);
-        rangeSeekbar.setCurrentRange(0, 1);
+        rangeSeekbar.setCurrentRange(0.5f, 1);
       }
     });
   }

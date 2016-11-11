@@ -328,6 +328,20 @@ public abstract class AbsSeekbar extends View {
     rect.bottom = (rect.top = y) + height;
   }
 
+  protected void setRectCenterX(Rect rect, int newCenterX) {
+    int width = rect.width();
+    int currentCenterX = rect.left + width/2;
+    int diff = newCenterX - currentCenterX;
+    setRectXPosition(rect, rect.left + diff);
+  }
+
+  protected void setRectCenterY(Rect rect, int newCenterY) {
+    int height = rect.height();
+    int currentCenterY = rect.top + height/2;
+    int diff = newCenterY - currentCenterY;
+    setRectYPosition(rect, rect.top + diff);
+  }
+
   protected void onDrawTrackDecoration(Canvas canvas, Paint sharedPaint) {
     sharedPaint.reset();
     sharedPaint.setAntiAlias(true);
