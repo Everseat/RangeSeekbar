@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.2.6](https://github.com/Everseat/RangeSeekbar/tree/0.2.6) (2016-11-11)
+[Full Changelog](https://github.com/Everseat/RangeSeekbar/compare/0.2.5...0.2.6)
+
+**Fixed bugs:**
+
+- Setting current range on RangeSeekbar doesn't update position [\#2](https://github.com/Everseat/RangeSeekbar/pull/2) ([alexfu](https://github.com/alexfu))
+
 ## [0.2.5](https://github.com/Everseat/RangeSeekbar/tree/0.2.5) (2016-08-30)
 [Full Changelog](https://github.com/Everseat/RangeSeekbar/compare/0.2.4...0.2.5)
 
