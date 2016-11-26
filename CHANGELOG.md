@@ -1,5 +1,16 @@
 # Change Log
 
+## [0.2.7](https://github.com/Everseat/RangeSeekbar/tree/0.2.7) (2016-11-26)
+[Full Changelog](https://github.com/Everseat/RangeSeekbar/compare/0.2.6...0.2.7)
+
+**Fixed bugs:**
+
+- Track sometimes not drawn [\#3](https://github.com/Everseat/RangeSeekbar/issues/3)
+
+**Merged pull requests:**
+
+- Refactor onLayout [\#4](https://github.com/Everseat/RangeSeekbar/pull/4) ([alexfu](https://github.com/alexfu))
+
 ## [0.2.6](https://github.com/Everseat/RangeSeekbar/tree/0.2.6) (2016-11-11)
 [Full Changelog](https://github.com/Everseat/RangeSeekbar/compare/0.2.5...0.2.6)
 
