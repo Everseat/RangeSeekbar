@@ -79,21 +79,24 @@ public abstract class AbsSeekbar extends View {
   }
 
   @Override
+  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    labelPaint.getTextBounds(minLabelText, 0, minLabelText.length(), minLabelBounds);
+    labelPaint.getTextBounds(maxLabelText, 0, maxLabelText.length(), maxLabelBounds);
+  }
+
+  @Override
   protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
     super.onLayout(changed, left, top, right, bottom);
     // Track
-    trackBounds.left = minLabelBounds.right + labelTextPadding + getTrackLeftOffset();
+    trackBounds.left = getTrackLeftOffset();
     trackBounds.top = (getMeasuredHeight() / 2) - trackHeight;
-    trackBounds.right = maxLabelBounds.left - labelTextPadding - getTrackRightOffset();
+    trackBounds.right = getMeasuredWidth() - getTrackRightOffset();
     trackBounds.bottom = trackBounds.top + trackHeight;
 
     // Min/max value label
-    labelPaint.getTextBounds(minLabelText, 0, minLabelText.length(), minLabelBounds);
-    labelPaint.getTextBounds(maxLabelText, 0, maxLabelText.length(), maxLabelBounds);
-    setRectXPosition(minLabelBounds, labelTextPadding);
-    setRectYPosition(minLabelBounds, (int) trackBounds.centerY() - (minLabelBounds.height() / 2));
-    setRectXPosition(maxLabelBounds, (getMeasuredWidth() - maxLabelBounds.width()) - labelTextPadding);
-    setRectYPosition(maxLabelBounds, (int) (trackBounds.centerY() - (minLabelBounds.height() / 2)));
+    minLabelBounds.offsetTo(labelTextPadding, (int) trackBounds.centerY() - (minLabelBounds.height() / 2));
+    maxLabelBounds.offsetTo((getMeasuredWidth() - maxLabelBounds.width()) - labelTextPadding, (int) (trackBounds.centerY() - (minLabelBounds.height() / 2)));
   }
 
   @Override
@@ -365,11 +368,11 @@ public abstract class AbsSeekbar extends View {
   }
 
   private int getTrackLeftOffset() {
-    return getThumbSize();
+    return (getThumbSize() / 2) + minLabelBounds.width() + (labelTextPadding * 2);
   }
 
   private int getTrackRightOffset() {
-    return getThumbSize();
+    return (getThumbSize() / 2) + maxLabelBounds.width() + (labelTextPadding * 2);
   }
 
   private int getThumbSize() {
